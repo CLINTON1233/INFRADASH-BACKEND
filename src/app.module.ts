@@ -6,24 +6,20 @@ import { User } from './users/user.entity';
 import { UsersModule } from './users/users.module';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
-})
-
-@Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
       port: 5432,
-      username: 'postgres',  
-      password: 'Sukses12345', 
-      database: 'infradash', 
+      username: 'postgres',
+      password: 'Sukses12345',
+      database: 'infradash',
       entities: [User],
-      synchronize: true, 
+      synchronize: true,
     }),
     UsersModule,
   ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
