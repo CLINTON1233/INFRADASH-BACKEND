@@ -6,7 +6,7 @@ import {
 } from 'typeorm';
 
 @Entity()
-export class User {
+export class user {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -28,7 +28,7 @@ export class User {
   @Column({ nullable: true })
   departemen: string;
 
-  @Column({ default: 'user' })
+  @Column({ default: 'admin' })
   role: string;
 
   @CreateDateColumn()
