@@ -6,12 +6,12 @@ async function bootstrap() {
 
   // Tambahkan ini untuk izinkan frontend akses
   app.enableCors({
-    origin: 'http://localhost:3000', // alamat Next.js kamu
+    origin: 'http://localhost:3000',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
 
-  await app.listen(4000); // ⬅️ ganti ke 4000
+  await app.listen(4000); //  ganti ke 4000
   console.log(` Server running on http://localhost:4000`);
 }
 bootstrap();

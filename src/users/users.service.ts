@@ -13,11 +13,20 @@ export class UsersService {
 
   async create(userData: Partial<user>): Promise<user> {
     const hashedPassword = await bcrypt.hash(userData.password, 10);
-    const user = this.usersRepository.create({ ...userData, password: hashedPassword });
+    const user = this.usersRepository.create({
+      ...userData,
+      password: hashedPassword,
+    });
     return this.usersRepository.save(user);
   }
-async findByEmail(email: string): Promise<user | undefined> {
-  const user = await this.usersRepository.findOne({ where: { email } });
-  return user ?? undefined;
-}
+
+  async update(id: number, updateData: Partial<user>): Promise<user> {
+    await this.usersRepository.update(id, updateData);
+    return (await this.usersRepository.findOne({ where: { id } }))!;
+  }
+
+  async findByEmail(email: string): Promise<user | undefined> {
+    const user = await this.usersRepository.findOne({ where: { email } });
+    return user ?? undefined;
+  }
 }

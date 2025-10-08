@@ -19,6 +19,17 @@ export class ApplicationsService {
     return this.appRepo.save(newApp);
   }
 
+  async update(
+    id: number,
+    appData: Partial<Application>,
+  ): Promise<Application> {
+    await this.appRepo.update(id, appData);
+    const updated = await this.appRepo.findOne({ where: { id } });
+    if (!updated) {
+      throw new Error('Application not found');
+    }
+    return updated;
+  }
   async remove(id: number): Promise<void> {
     await this.appRepo.delete(id);
   }

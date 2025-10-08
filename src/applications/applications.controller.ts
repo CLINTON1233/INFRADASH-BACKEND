@@ -1,6 +1,15 @@
-import { Controller, Get, Post, Body, Delete, Param, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Delete,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { ApplicationsService } from './applications.service';
 import { Application } from './application.entity';
+import { Put } from '@nestjs/common';
 
 @Controller('applications')
 export class ApplicationsController {
@@ -16,8 +25,17 @@ export class ApplicationsController {
     return this.appsService.create(body);
   }
 
+  @Put(':id')
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: Partial<Application>,
+  ): Promise<Application> {
+    return this.appsService.update(id, body);
+  }
+
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number): Promise<void> { // <--- parse id ke number
+  remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    // <--- parse id ke number
     return this.appsService.remove(id);
   }
 }
