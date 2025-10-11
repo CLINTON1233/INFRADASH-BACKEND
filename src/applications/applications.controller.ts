@@ -25,14 +25,20 @@ export class ApplicationsController {
     return this.appsService.findAll();
   }
 
-  // ✅ handle upload file + formData
+  // Endpoint baru untuk mendapatkan aplikasi yang sudah dikelompokkan
+  @Get('grouped')
+  getGroupedByCategory(): Promise<{ [key: string]: Application[] }> {
+    return this.appsService.findAllGroupedByCategory();
+  }
+
   @Post()
   @UseInterceptors(
     FileInterceptor('iconFile', {
       storage: diskStorage({
-        destination: './uploads', // folder tujuan upload
+        destination: './uploads',
         filename: (req, file, callback) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
           const ext = extname(file.originalname);
           callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
         },
@@ -47,7 +53,8 @@ export class ApplicationsController {
       title: body.title,
       fullName: body.fullName,
       url: body.url,
-      icon: file ? file.filename : body.icon, 
+      icon: file ? file.filename : body.icon,
+      category: body.category || 'Uncategorized', // Tambahkan kategori
     };
     return this.appsService.create(appData);
   }
@@ -57,7 +64,13 @@ export class ApplicationsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() body: Partial<Application>,
   ): Promise<Application> {
-    return this.appsService.update(id, body);
+    return this.appsService.update(id, {
+      title: body.title,
+      fullName: body.fullName,
+      url: body.url,
+      icon: body.icon,
+      category: body.category || 'Uncategorized', // Tambahkan ini
+    });
   }
 
   @Delete(':id')

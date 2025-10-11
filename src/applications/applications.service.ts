@@ -11,7 +11,27 @@ export class ApplicationsService {
   ) {}
 
   findAll(): Promise<Application[]> {
-    return this.appRepo.find();
+    return this.appRepo.find({
+      order: {
+        category: 'ASC',
+        title: 'ASC',
+      },
+    });
+  }
+
+  // Method baru untuk mendapatkan aplikasi grouped by kategori
+  async findAllGroupedByCategory(): Promise<{ [key: string]: Application[] }> {
+    const apps = await this.findAll();
+    const grouped: { [key: string]: Application[] } = {};
+
+    apps.forEach((app) => {
+      if (!grouped[app.category]) {
+        grouped[app.category] = [];
+      }
+      grouped[app.category].push(app);
+    });
+
+    return grouped;
   }
 
   create(appData: Partial<Application>): Promise<Application> {
@@ -30,6 +50,7 @@ export class ApplicationsService {
     }
     return updated;
   }
+
   async remove(id: number): Promise<void> {
     await this.appRepo.delete(id);
   }

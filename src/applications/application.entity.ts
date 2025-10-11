@@ -15,5 +15,8 @@ export class Application {
   url: string;
 
   @Column({ length: 50 })
-  icon: string; 
+  icon: string;
+
+  @Column({ length: 100, default: 'Uncategorized' })
+  category: string;
 }
