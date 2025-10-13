@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Category } from '../category/category.entity';
 
 @Entity('applications')
 export class Application {
@@ -17,6 +18,13 @@ export class Application {
   @Column({ length: 50 })
   icon: string;
 
-  @Column({ length: 100, default: 'Uncategorized' })
-  category: string;
+  @ManyToOne(() => Category, category => category.applications, { 
+    eager: true,
+    nullable: false 
+  })
+  @JoinColumn({ name: 'categoryId' })
+  category: Category;
+
+  @Column()
+  categoryId: number;
 }

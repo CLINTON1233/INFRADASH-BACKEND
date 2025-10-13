@@ -6,7 +6,7 @@ import { user } from './users/user.entity';
 import { UsersModule } from './users/users.module';
 import { Application } from './applications/application.entity';
 import { ApplicationsModule } from './applications/applications.module'; 
-
+import { Category } from './category/category.entity'; 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -16,7 +16,7 @@ import { ApplicationsModule } from './applications/applications.module';
       username: 'postgres',
       password: 'Sukses12345',
       database: 'infradash',
-      entities: [user, Application],
+      entities: [user, Application, Category],
       synchronize: true,
     }),
     UsersModule,

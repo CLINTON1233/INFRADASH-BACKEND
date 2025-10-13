@@ -25,7 +25,6 @@ export class ApplicationsController {
     return this.appsService.findAll();
   }
 
-  // Endpoint baru untuk mendapatkan aplikasi yang sudah dikelompokkan
   @Get('grouped')
   getGroupedByCategory(): Promise<{ [key: string]: Application[] }> {
     return this.appsService.findAllGroupedByCategory();
@@ -37,10 +36,9 @@ export class ApplicationsController {
       storage: diskStorage({
         destination: './uploads',
         filename: (req, file, callback) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
           const ext = extname(file.originalname);
-          callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+          callback(null, `icon-${uniqueSuffix}${ext}`);
         },
       }),
     }),
@@ -54,23 +52,46 @@ export class ApplicationsController {
       fullName: body.fullName,
       url: body.url,
       icon: file ? file.filename : body.icon,
-      category: body.category || 'Uncategorized', // Tambahkan kategori
+      categoryId: parseInt(body.categoryId),
     };
     return this.appsService.create(appData);
   }
 
   @Put(':id')
-  update(
+  @UseInterceptors(
+    FileInterceptor('iconFile', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, callback) => {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          callback(null, `icon-${uniqueSuffix}${ext}`);
+        },
+      }),
+    }),
+  )
+  async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() body: Partial<Application>,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: any,
   ): Promise<Application> {
-    return this.appsService.update(id, {
+    const updateData: Partial<Application> = {
       title: body.title,
       fullName: body.fullName,
       url: body.url,
-      icon: body.icon,
-      category: body.category || 'Uncategorized', // Tambahkan ini
-    });
+    };
+
+    if (body.categoryId) {
+      updateData.categoryId = parseInt(body.categoryId);
+    }
+
+    if (file) {
+      updateData.icon = file.filename;
+    } else if (body.icon) {
+      updateData.icon = body.icon;
+    }
+
+    return this.appsService.update(id, updateData);
   }
 
   @Delete(':id')
