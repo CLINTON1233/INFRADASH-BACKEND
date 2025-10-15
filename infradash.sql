@@ -2,12 +2,12 @@
 -- PostgreSQL database dump
 --
 
-\restrict ldd5GcABQStY30s4VI4fE7BkNgCy7YxYPgs3u8UzguPKK6iDaN4qUhBzjOpUb4d
+\restrict qYGOjRxGqRtS9L9mLGOFscnl47p8EFMNCv6lrmtqO4xEN3jw4b0gMj7qGBpR9rp
 
 -- Dumped from database version 18.0
 -- Dumped by pg_dump version 18.0
 
--- Started on 2025-10-13 15:58:37
+-- Started on 2025-10-15 09:46:05
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -182,13 +182,11 @@ ALTER TABLE ONLY public."user" ALTER COLUMN id SET DEFAULT nextval('public.user_
 --
 
 INSERT INTO public.applications VALUES (19, 'IPAM', 'IP Addres Management', 'http://10.5.252.156', 'Globe', 1);
-INSERT INTO public.applications VALUES (23, 'Network', 'network', 'https://myinternship.id/index.php', 'Network', 1);
-INSERT INTO public.applications VALUES (21, 'VmWare', 'Vpshere, Vmware', 'https://10.5.252.101', 'Monitor', 1);
 INSERT INTO public.applications VALUES (20, 'WLC Controllers', 'WLC LAN Controllers', 'https://10.5.252.64:8443', 'Wifi', 1);
-INSERT INTO public.applications VALUES (24, 'SMOE', 'SMOE PORTAL', 'https://www.smoebatam.com/smoe_portal/home', 'Globe', 1);
-INSERT INTO public.applications VALUES (22, 'Seatrium', 'Seatrium', 'https://www.smoebatam.com/smoe_portal/', 'Server', 11);
-INSERT INTO public.applications VALUES (25, 'Drive', 'Drive', 'https://drive.google.com/drive/folders/1MB165zrlJnRILudeJrh5HfMlRglJcF1G', 'File', 11);
-INSERT INTO public.applications VALUES (26, 'Drive', 'drive', 'https://drive.google.com/drive/folders/1MB165zrlJnRILudeJrh5HfMlRglJcF1G', 'File', 11);
+INSERT INTO public.applications VALUES (31, 'VmWare', 'VmWare, Vsphere', 'https://10.5.252.101', 'Monitor', 1);
+INSERT INTO public.applications VALUES (32, 'Seatrium', 'Seatrium', 'https://seatrium.com/brazil-en.php', 'Globe', 2);
+INSERT INTO public.applications VALUES (33, 'Drive', 'Drive Documentation', 'https://drive.google.com/drive/', 'File', 11);
+INSERT INTO public.applications VALUES (34, 'Ms Office', 'Ms Office', 'https://www.office.com/', 'File', 11);
 
 
 --
@@ -240,7 +238,7 @@ INSERT INTO public."user" VALUES (18, 'Fery', 'fery@gmail.com', '$2b$10$hYU4feD3
 -- Name: applications_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.applications_id_seq', 26, true);
+SELECT pg_catalog.setval('public.applications_id_seq', 34, true);
 
 
 --
@@ -315,11 +313,11 @@ ALTER TABLE ONLY public.applications
     ADD CONSTRAINT "FK_e8a06d416399a4c08b4a86574bb" FOREIGN KEY ("categoryId") REFERENCES public.categories(id);
 
 
--- Completed on 2025-10-13 15:58:38
+-- Completed on 2025-10-15 09:46:06
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict ldd5GcABQStY30s4VI4fE7BkNgCy7YxYPgs3u8UzguPKK6iDaN4qUhBzjOpUb4d
+\unrestrict qYGOjRxGqRtS9L9mLGOFscnl47p8EFMNCv6lrmtqO4xEN3jw4b0gMj7qGBpR9rp
 
