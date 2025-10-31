@@ -15,6 +15,7 @@ export class ApplicationsService {
 
   async findAll(): Promise<Application[]> {
     return this.applicationsRepository.find({
+      where: { status: 1 }, // HANYA AMBIL YANG STATUS = 1 (active)
       relations: ['category'],
       order: { title: 'ASC' }
     });
@@ -35,13 +36,19 @@ export class ApplicationsService {
     return grouped;
   }
 
+  // TAMBAHKAN METHOD UNTUK MENDAPATKAN SEMUA DATA (TERMASUK YANG DIHAPUS)
+  async findAllIncludingDeleted(): Promise<Application[]> {
+    return this.applicationsRepository.find({
+      relations: ['category'],
+      order: { title: 'ASC' }
+    });
+  }
+
   async create(appData: Partial<Application>): Promise<Application> {
-    // Validasi categoryId
     if (!appData.categoryId) {
       throw new NotFoundException('Category ID is required');
     }
 
-    // Cari category berdasarkan ID
     const category = await this.categoriesRepository.findOne({ 
       where: { id: appData.categoryId } 
     });
@@ -55,7 +62,8 @@ export class ApplicationsService {
       fullName: appData.fullName,
       url: appData.url,
       icon: appData.icon,
-      category: category
+      category: category,
+      status: 1 // DEFAULT STATUS ACTIVE
     });
 
     return this.applicationsRepository.save(application);
@@ -93,10 +101,32 @@ export class ApplicationsService {
     return this.applicationsRepository.save(application);
   }
 
+  // UBAH METHOD REMOVE UNTUK SOFT DELETE
   async remove(id: number): Promise<void> {
-    const result = await this.applicationsRepository.delete(id);
-    if (result.affected === 0) {
+    const application = await this.applicationsRepository.findOne({ 
+      where: { id } 
+    });
+
+    if (!application) {
       throw new NotFoundException(`Application with ID ${id} not found`);
     }
+
+    // UPDATE STATUS MENJADI 0 (DELETED) BUKAN HAPUS DATA
+    application.status = 0;
+    await this.applicationsRepository.save(application);
+  }
+
+  // TAMBAHKAN METHOD UNTUK RESTORE DATA
+  async restore(id: number): Promise<Application> {
+    const application = await this.applicationsRepository.findOne({ 
+      where: { id } 
+    });
+
+    if (!application) {
+      throw new NotFoundException(`Application with ID ${id} not found`);
+    }
+
+    application.status = 1;
+    return this.applicationsRepository.save(application);
   }
 }

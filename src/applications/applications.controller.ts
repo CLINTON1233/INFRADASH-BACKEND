@@ -9,6 +9,7 @@ import {
   Put,
   UploadedFile,
   UseInterceptors,
+  Patch,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApplicationsService } from './applications.service';
@@ -23,6 +24,12 @@ export class ApplicationsController {
   @Get()
   getAll(): Promise<Application[]> {
     return this.appsService.findAll();
+  }
+
+  // ENDPOINT BARU UNTUK MENDAPATKAN SEMUA DATA (TERMASUK YANG DIHAPUS)
+  @Get('all')
+  getAllIncludingDeleted(): Promise<Application[]> {
+    return this.appsService.findAllIncludingDeleted();
   }
 
   @Get('grouped')
@@ -97,5 +104,11 @@ export class ApplicationsController {
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.appsService.remove(id);
+  }
+
+  // ENDPOINT BARU UNTUK RESTORE DATA
+  @Patch(':id/restore')
+  restore(@Param('id', ParseIntPipe) id: number): Promise<Application> {
+    return this.appsService.restore(id);
   }
 }

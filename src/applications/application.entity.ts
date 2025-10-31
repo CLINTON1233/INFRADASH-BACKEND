@@ -27,4 +27,8 @@ export class Application {
 
   @Column()
   categoryId: number;
+
+  // TAMBAHKAN FIELD STATUS UNTUK SOFT DELETE
+  @Column({ default: 1 }) // 1 = active, 0 = deleted
+  status: number;
 }
