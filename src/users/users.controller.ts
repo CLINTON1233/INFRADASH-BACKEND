@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Put, Param } from '@nestjs/common';
+import { Controller, Post, Body, Put, Param, Get, Delete } from '@nestjs/common';
 import { UsersService } from './users.service';
 import * as bcrypt from 'bcrypt';
 
@@ -6,13 +6,38 @@ import * as bcrypt from 'bcrypt';
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
+  // GET all users
+  @Get()
+  async getAllUsers() {
+    const users = await this.usersService.findAll();
+    return { status: 'success', users };
+  }
+
+  // POST register new user
   @Post('register')
   async register(@Body() body) {
     if (!body.email) return { status: 'error', message: 'Email is required' };
+    if (!body.password) return { status: 'error', message: 'Password is required' };
+    
     const existing = await this.usersService.findByEmail(body.email);
     if (existing) return { status: 'error', message: 'Email already exists' };
+    
     const user = await this.usersService.create(body);
     return { status: 'success', user };
+  }
+
+  // PUT update user
+  @Put(':id')
+  async update(@Param('id') id: number, @Body() body) {
+    const updatedUser = await this.usersService.update(id, body);
+    return { status: 'success', user: updatedUser };
+  }
+
+  // DELETE user
+  @Delete(':id')
+  async delete(@Param('id') id: number) {
+    await this.usersService.delete(id);
+    return { status: 'success', message: 'User deleted successfully' };
   }
 
   @Post('login')
@@ -36,17 +61,5 @@ export class UsersController {
         role: user.role,
       },
     };
-  }
-
-  // ===== Tambahkan Update Endpoint =====
-  @Put(':id')
-  async update(@Param('id') id: number, @Body() body) {
-    // Jangan update email dan role
-    const updateData = { ...body };
-    delete updateData.email;
-    delete updateData.role;
-
-    const updatedUser = await this.usersService.update(id, updateData);
-    return { status: 'success', user: updatedUser };
   }
 }
