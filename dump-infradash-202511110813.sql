@@ -2,12 +2,12 @@
 -- PostgreSQL database dump
 --
 
-\restrict qYGOjRxGqRtS9L9mLGOFscnl47p8EFMNCv6lrmtqO4xEN3jw4b0gMj7qGBpR9rp
+\restrict 5ptBZat4yx1oqX7UUCT9fka6mGtKSqmZMNbjtAlkMdv7C8ctVCjzPVSIdNE52bV
 
 -- Dumped from database version 18.0
 -- Dumped by pg_dump version 18.0
 
--- Started on 2025-10-15 09:46:05
+-- Started on 2025-11-11 08:13:14
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -36,7 +36,8 @@ CREATE TABLE public.applications (
     "fullName" character varying(255) NOT NULL,
     url character varying(255) NOT NULL,
     icon character varying(50) NOT NULL,
-    "categoryId" integer CONSTRAINT applications_categoryid_not_null NOT NULL
+    "categoryId" integer CONSTRAINT applications_categoryid_not_null NOT NULL,
+    status integer DEFAULT 1 NOT NULL
 );
 
 
@@ -59,7 +60,7 @@ CREATE SEQUENCE public.applications_id_seq
 ALTER SEQUENCE public.applications_id_seq OWNER TO postgres;
 
 --
--- TOC entry 5040 (class 0 OID 0)
+-- TOC entry 5041 (class 0 OID 0)
 -- Dependencies: 221
 -- Name: applications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -98,7 +99,7 @@ CREATE SEQUENCE public.categories_id_seq
 ALTER SEQUENCE public.categories_id_seq OWNER TO postgres;
 
 --
--- TOC entry 5041 (class 0 OID 0)
+-- TOC entry 5042 (class 0 OID 0)
 -- Dependencies: 223
 -- Name: categories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -143,7 +144,7 @@ CREATE SEQUENCE public.user_id_seq
 ALTER SEQUENCE public.user_id_seq OWNER TO postgres;
 
 --
--- TOC entry 5042 (class 0 OID 0)
+-- TOC entry 5043 (class 0 OID 0)
 -- Dependencies: 219
 -- Name: user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -160,7 +161,7 @@ ALTER TABLE ONLY public.applications ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
--- TOC entry 4870 (class 2604 OID 24599)
+-- TOC entry 4871 (class 2604 OID 24599)
 -- Name: categories id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -176,21 +177,22 @@ ALTER TABLE ONLY public."user" ALTER COLUMN id SET DEFAULT nextval('public.user_
 
 
 --
--- TOC entry 5032 (class 0 OID 16473)
+-- TOC entry 5033 (class 0 OID 16473)
 -- Dependencies: 222
 -- Data for Name: applications; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.applications VALUES (19, 'IPAM', 'IP Addres Management', 'http://10.5.252.156', 'Globe', 1);
-INSERT INTO public.applications VALUES (20, 'WLC Controllers', 'WLC LAN Controllers', 'https://10.5.252.64:8443', 'Wifi', 1);
-INSERT INTO public.applications VALUES (31, 'VmWare', 'VmWare, Vsphere', 'https://10.5.252.101', 'Monitor', 1);
-INSERT INTO public.applications VALUES (32, 'Seatrium', 'Seatrium', 'https://seatrium.com/brazil-en.php', 'Globe', 2);
-INSERT INTO public.applications VALUES (33, 'Drive', 'Drive Documentation', 'https://drive.google.com/drive/', 'File', 11);
-INSERT INTO public.applications VALUES (34, 'Ms Office', 'Ms Office', 'https://www.office.com/', 'File', 11);
+INSERT INTO public.applications VALUES (19, 'IPAM', 'IP Addres Management', 'http://10.5.252.156', 'Globe', 1, 1);
+INSERT INTO public.applications VALUES (31, 'VmWare', 'VmWare, Vsphere', 'https://10.5.252.101', 'Monitor', 1, 1);
+INSERT INTO public.applications VALUES (32, 'Seatrium', 'Seatrium', 'https://seatrium.com/brazil-en.php', 'Globe', 2, 1);
+INSERT INTO public.applications VALUES (20, 'WLC Controllers', 'WLC LAN Controllers', 'https://10.5.252.64:8443', 'Wifi', 1, 0);
+INSERT INTO public.applications VALUES (34, 'Ms Office', 'Ms Office', 'https://www.office.com/', 'File', 11, 0);
+INSERT INTO public.applications VALUES (35, 'WLC Controllers', 'WLC LAN Controllers', 'https://10.5.252.64:8443', 'Wifi', 1, 1);
+INSERT INTO public.applications VALUES (33, 'Drive', 'Drive Documentation', 'https://drive.google.com/drive/', 'File', 11, 0);
 
 
 --
--- TOC entry 5034 (class 0 OID 24596)
+-- TOC entry 5035 (class 0 OID 24596)
 -- Dependencies: 224
 -- Data for Name: categories; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -218,31 +220,30 @@ INSERT INTO public.categories VALUES (20, 'Container Platform', 'Container orche
 
 
 --
--- TOC entry 5030 (class 0 OID 16438)
+-- TOC entry 5031 (class 0 OID 16438)
 -- Dependencies: 220
 -- Data for Name: user; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public."user" VALUES (14, 'daasada', 'das664@gmail.com', '$2b$10$E9nyHO/e7J39XyY2WI8xLOXd/.Zc4gTGHjv5wFur4ZX712mTB9Da.', '312321312', '131312', 'IT Departement', 'superadmin', '2025-10-08 13:51:06.837823');
-INSERT INTO public."user" VALUES (15, 'Ikhsan Kurniawan', 'ikhsan664@gmail.com', '$2b$10$54fVAPrl5UqRwwVF/MeA0egnIAeNA99Hy.Ga4ULI90Q8eFJId1xmG', '3131224', '088280801122', 'IT Departement', 'superadmin', '2025-10-08 14:01:44.965208');
 INSERT INTO public."user" VALUES (16, 'Yovan Sakti', 'yovan664@gmail.com', '$2b$10$OogWryxTNiWB3ND5XKvGUO41.cRkeUjFnBn9tK8OjyM97Fbh5wIjq', '909088881', '088270801124', 'IT Departement', 'superadmin', '2025-10-09 07:40:56.702483');
-INSERT INTO public."user" VALUES (17, 'Clinton alfaro', 'alfaro664@gmail.com', '$2b$10$qGXdX9ocwu3fu7UzoTlzWuyF/CRKefyIoofVuz2cmV.yVfbwV9s.C', '312213412', '088270801123', 'IT Departement', 'superadmin', '2025-10-09 11:33:52.253859');
-INSERT INTO public."user" VALUES (19, 'Fery', 'FERR664@gmail.com', '$2b$10$C9lTrFiJv2CVNp3yI.UmD.TLblsx0WRRLDi8V21GPRfSVsqa2Mne.', '124125412', '08888912131', 'IT Developer', 'admin', '2025-10-10 08:51:38.350961');
-INSERT INTO public."user" VALUES (13, 'Clinton Alfaro Siagian', 'clintonalfaro664@gmail.com', '$2b$10$ZxU6Jy7jvWjF2/aZxMnHCe9glaH24kdNxC7GPGzlzI/CztcPKMuPa', '90902237565858556', '088270801122', 'IT Developer', 'admin', '2025-10-08 11:48:29.191328');
-INSERT INTO public."user" VALUES (18, 'Fery', 'fery@gmail.com', '$2b$10$hYU4feD35t4zz7EJf5srE.LNi1JPSB9PES8Oj.EaSVA8MrTHuBKUa', '12344567', '08888912131', 'IT Infrastructure', 'superadmin', '2025-10-10 07:36:31.584341');
-
-
---
--- TOC entry 5043 (class 0 OID 0)
--- Dependencies: 221
--- Name: applications_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.applications_id_seq', 34, true);
+INSERT INTO public."user" VALUES (22, 'fery yansyah', 'feryyansyah@gmail.com', '$2b$10$lmmlsRcv5TbMxArDwH2B9O.V1CJMwtndEwBYkuJYQpaHRK7YVcD/K', '1122121', '0898909', 'IT', 'superadmin', '2025-11-10 15:30:15.308186');
+INSERT INTO public."user" VALUES (23, 'robie darma', 'robiedarma@gmail.com', '$2b$10$7IeOX6kF0oyRe.yjQelj2elcHFoy/8B7hl9NVNltt8WSxgfWXNVLG', '567890', '08825654645', 'IT', 'admin', '2025-11-10 15:46:29.879932');
+INSERT INTO public."user" VALUES (24, 'Roihan Habibi', 'roihanhabibi@gmail.com', '$2b$10$2GiZ6NaO/nloJ3qk6cQYYeDRDcNCT8kGdceYbPVrVoprn8x.X8u/G', '9090898', '08827097987', 'IT', 'admin', '2025-11-11 07:47:00.178957');
+INSERT INTO public."user" VALUES (25, 'Ikhsan Kurniawan', 'ikhsan.kurniawan@seatrium.com', '$2b$10$Kwl2676XJiuBgUvEuiLFdubhwL/1HyRdV8g4Utbnh2rbgJ/MedvX6', '10031059', '081372282668', 'IT ', 'superadmin', '2025-11-11 07:51:45.288084');
+INSERT INTO public."user" VALUES (26, 'Clinton Alfaro', 'clintonalfaro664@gmail.com', '$2b$10$K48cDuiPGJ3KKovdWp0eOOPMpg42Ww5yKQZk0qxXc5ES29CAb2gk6', '9090223', '088270801123', 'IT', 'superadmin', '2025-11-11 08:07:21.816853');
 
 
 --
 -- TOC entry 5044 (class 0 OID 0)
+-- Dependencies: 221
+-- Name: applications_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.applications_id_seq', 35, true);
+
+
+--
+-- TOC entry 5045 (class 0 OID 0)
 -- Dependencies: 223
 -- Name: categories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -251,16 +252,16 @@ SELECT pg_catalog.setval('public.categories_id_seq', 40, true);
 
 
 --
--- TOC entry 5045 (class 0 OID 0)
+-- TOC entry 5046 (class 0 OID 0)
 -- Dependencies: 219
 -- Name: user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.user_id_seq', 19, true);
+SELECT pg_catalog.setval('public.user_id_seq', 26, true);
 
 
 --
--- TOC entry 4872 (class 2606 OID 16452)
+-- TOC entry 4873 (class 2606 OID 16452)
 -- Name: user PK_cace4a159ff9f2512dd42373760; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -269,7 +270,7 @@ ALTER TABLE ONLY public."user"
 
 
 --
--- TOC entry 4874 (class 2606 OID 16454)
+-- TOC entry 4875 (class 2606 OID 16454)
 -- Name: user UQ_e12875dfb3b1d92d7d7c5377e22; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -278,7 +279,7 @@ ALTER TABLE ONLY public."user"
 
 
 --
--- TOC entry 4876 (class 2606 OID 16485)
+-- TOC entry 4877 (class 2606 OID 16485)
 -- Name: applications applications_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -287,7 +288,7 @@ ALTER TABLE ONLY public.applications
 
 
 --
--- TOC entry 4878 (class 2606 OID 24605)
+-- TOC entry 4879 (class 2606 OID 24605)
 -- Name: categories categories_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -296,7 +297,7 @@ ALTER TABLE ONLY public.categories
 
 
 --
--- TOC entry 4880 (class 2606 OID 24603)
+-- TOC entry 4881 (class 2606 OID 24603)
 -- Name: categories categories_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -305,7 +306,7 @@ ALTER TABLE ONLY public.categories
 
 
 --
--- TOC entry 4881 (class 2606 OID 24612)
+-- TOC entry 4882 (class 2606 OID 24612)
 -- Name: applications FK_e8a06d416399a4c08b4a86574bb; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -313,11 +314,11 @@ ALTER TABLE ONLY public.applications
     ADD CONSTRAINT "FK_e8a06d416399a4c08b4a86574bb" FOREIGN KEY ("categoryId") REFERENCES public.categories(id);
 
 
--- Completed on 2025-10-15 09:46:06
+-- Completed on 2025-11-11 08:13:14
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict qYGOjRxGqRtS9L9mLGOFscnl47p8EFMNCv6lrmtqO4xEN3jw4b0gMj7qGBpR9rp
+\unrestrict 5ptBZat4yx1oqX7UUCT9fka6mGtKSqmZMNbjtAlkMdv7C8ctVCjzPVSIdNE52bV
 
