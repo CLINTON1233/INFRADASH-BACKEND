@@ -5,9 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { user } from './users/user.entity';
 import { UsersModule } from './users/users.module';
 import { Application } from './applications/application.entity';
-import { ApplicationsModule } from './applications/applications.module'; 
-import { Category } from './category/category.entity'; 
+import { ApplicationsModule } from './applications/applications.module';
+import { Category } from './category/category.entity';
 import { Icon } from './icon/icon.entity';
+import { IconsModule } from './icon/icons.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -21,7 +22,8 @@ import { Icon } from './icon/icon.entity';
       synchronize: true,
     }),
     UsersModule,
-    ApplicationsModule, 
+    ApplicationsModule,
+    IconsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
