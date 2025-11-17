@@ -16,7 +16,6 @@ export class ApplicationsModule implements OnModuleInit {
   constructor(private readonly categoriesService: CategoriesService) {}
 
   async onModuleInit() {
-    // Seed default categories ketika module diinisialisasi
     try {
       await this.categoriesService.seedDefaultCategories();
     } catch (error) {
