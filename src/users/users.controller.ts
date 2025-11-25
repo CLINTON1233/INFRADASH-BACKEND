@@ -5,7 +5,6 @@ import {
   Put,
   Param,
   Get,
-    Req,
   Delete,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
@@ -72,81 +71,4 @@ export class UsersController {
       },
     };
   }
-  // users.controller.ts - tambahkan method ini
-  @Post('generate-token')
-  async generateToken(@Body() body) {
-    const { email, password } = body;
-    const user = await this.usersService.findByEmail(email);
-
-    if (!user) return { status: 'error', message: 'User not found' };
-
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) return { status: 'error', message: 'Invalid password' };
-
-    // Generate simple token (bisa pakai JWT library nanti)
-    const token = Buffer.from(`${user.id}:${Date.now()}`).toString('base64');
-
-    return {
-      status: 'success',
-      token: token,
-      user: {
-        id: user.id,
-        nama: user.nama,
-        email: user.email,
-        role: user.role,
-      },
-    };
-  }
-  // users.controller.ts - tambahkan method ini
-@Post('verify-session')
-async verifySession(@Req() request) {
-  // Cek jika user sudah login (sesuai dengan auth middleware Anda)
-  if (request.user) {
-    return {
-      status: 'success',
-      user: {
-        id: request.user.id,
-        nama: request.user.nama,
-        email: request.user.email,
-        role: request.user.role,
-      },
-      valid: true
-    };
-  } else {
-    return {
-      status: 'error',
-      message: 'Not authenticated',
-      valid: false
-    };
-  }
-}
-
-// Endpoint untuk generate token WebSSH
-@Post('generate-webssh-token')
-async generateWebSSHToken(@Req() request) {
-  if (!request.user) {
-    return { status: 'error', message: 'Not authenticated' };
-  }
-
-  // Generate simple token untuk WebSSH
-  const tokenData = {
-    userId: request.user.id,
-    email: request.user.email,
-    nama: request.user.nama,
-    timestamp: Date.now(),
-    expiry: Date.now() + (10 * 60 * 1000) // 10 menit
-  };
-
-  const token = Buffer.from(JSON.stringify(tokenData)).toString('base64');
-  
-  return {
-    status: 'success',
-    token: token,
-    user: {
-      id: request.user.id,
-      nama: request.user.nama,
-      email: request.user.email
-    }
-  };
-}
 }
