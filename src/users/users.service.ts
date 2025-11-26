@@ -56,4 +56,8 @@ export class UsersService {
     const user = await this.usersRepository.findOne({ where: { id } });
     return user ?? undefined;
   }
+// For authentication purposes
+   async findByEmailForAuth(email: string): Promise<user | undefined> {
+    return this.findByEmail(email);
+  }
 }
