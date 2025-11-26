@@ -9,10 +9,16 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
+import { UnauthorizedException } from '@nestjs/common';
+
 
 @Controller('users')
 export class UsersController {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private jwtService: JwtService,
+  ) {}
 
   // GET all users
   @Get()
@@ -54,12 +60,22 @@ export class UsersController {
     const { email, password } = body;
     const user = await this.usersService.findByEmail(email);
     if (!user) return { status: 'error', message: 'Email tidak ditemukan' };
+
     const match = await bcrypt.compare(password, user.password);
     if (!match) return { status: 'error', message: 'Password salah' };
+
+    const payload = {
+      id: user.id,
+      role: user.role,
+      email: user.email,
+    };
+
+    const token = await this.jwtService.signAsync(payload);
 
     return {
       status: 'success',
       message: 'Login berhasil',
+      token,
       user: {
         id: user.id,
         nama: user.nama,
@@ -70,6 +86,16 @@ export class UsersController {
         role: user.role,
       },
     };
-  
   }
+
+@Post('verify-token')
+verifyToken(@Body() body) {
+  try {
+    const decoded = this.jwtService.verify(body.token);
+    return { status: 'valid', decoded };
+  } catch (e) {
+    throw new UnauthorizedException('Invalid token');
+  }
+}
+
 }
