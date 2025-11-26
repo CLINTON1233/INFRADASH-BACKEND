@@ -12,7 +12,6 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { UnauthorizedException } from '@nestjs/common';
 
-
 @Controller('users')
 export class UsersController {
   constructor(
@@ -88,14 +87,13 @@ export class UsersController {
     };
   }
 
-@Post('verify-token')
-verifyToken(@Body() body) {
-  try {
-    const decoded = this.jwtService.verify(body.token);
-    return { status: 'valid', decoded };
-  } catch (e) {
-    throw new UnauthorizedException('Invalid token');
+  @Post('verify-token')
+  verifyToken(@Body() body) {
+    try {
+      const decoded = this.jwtService.verify(body.token);
+      return { status: 'valid', decoded };
+    } catch (e) {
+      throw new UnauthorizedException('Invalid token');
+    }
   }
-}
-
 }
