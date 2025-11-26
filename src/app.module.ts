@@ -9,7 +9,7 @@ import { ApplicationsModule } from './applications/applications.module';
 import { Category } from './category/category.entity';
 import { Icon } from './icon/icon.entity';
 import { IconsModule } from './icon/icons.module';
-import { AuthController } from './auth/auth.controller';
+
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -26,7 +26,7 @@ import { AuthController } from './auth/auth.controller';
     ApplicationsModule,
     IconsModule,
   ],
-  controllers: [AppController, AuthController,],
+  controllers: [AppController,],
   providers: [AppService],
 })
 export class AppModule {}
