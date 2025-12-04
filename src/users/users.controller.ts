@@ -96,4 +96,5 @@ export class UsersController {
       throw new UnauthorizedException('Invalid token');
     }
   }
+  
 }
