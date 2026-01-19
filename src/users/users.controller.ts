@@ -96,5 +96,57 @@ export class UsersController {
       throw new UnauthorizedException('Invalid token');
     }
   }
-  
+   @Post('verify-for-monitoring')
+  async verifyTokenForMonitoring(@Body() body: { token: string }) {
+    try {
+      // Verify token
+      const decoded = this.jwtService.verify(body.token);
+      
+      // Get user data dari database
+      const user = await this.usersService.findById(decoded.id);
+      
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      // Return data yang diperlukan untuk monitoring app
+      return {
+        status: 'success',
+        user: {
+          id: user.id,
+          nama: user.nama,
+          email: user.email,
+          badge: user.badge,
+          telp: user.telp,
+          departemen: user.departemen,
+          role: user.role,
+          permissions: this.getUserPermissions(user.role),
+        },
+      };
+    } catch (error) {
+      console.error('Token verification error:', error);
+      return { 
+        status: 'error', 
+        message: 'Invalid or expired token' 
+      };
+    }
+  }
+
+  // Helper untuk menentukan permissions berdasarkan role
+  private getUserPermissions(role: string) {
+    const permissions = {
+      view_dashboard: true,
+      view_cameras: true,
+      view_reports: false,
+      manage_devices: false,
+    };
+
+    if (role === 'superadmin' || role === 'admin') {
+      permissions.view_reports = true;
+      permissions.manage_devices = true;
+    }
+
+    return permissions;
+  }
+
 }
