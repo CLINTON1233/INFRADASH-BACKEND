@@ -6,11 +6,14 @@ import {
   Param,
   Get,
   Delete,
+  Res,
+  Req,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { UnauthorizedException } from '@nestjs/common';
+import type { Response, Request } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -19,43 +22,8 @@ export class UsersController {
     private jwtService: JwtService,
   ) {}
 
-  // GET all users
-  @Get()
-  async getAllUsers() {
-    const users = await this.usersService.findAll();
-    return { status: 'success', users };
-  }
-
-  // POST register new user
-  @Post('register')
-  async register(@Body() body) {
-    if (!body.email) return { status: 'error', message: 'Email is required' };
-    if (!body.password)
-      return { status: 'error', message: 'Password is required' };
-
-    const existing = await this.usersService.findByEmail(body.email);
-    if (existing) return { status: 'error', message: 'Email already exists' };
-
-    const user = await this.usersService.create(body);
-    return { status: 'success', user };
-  }
-
-  // PUT update user
-  @Put(':id')
-  async update(@Param('id') id: number, @Body() body) {
-    const updatedUser = await this.usersService.update(id, body);
-    return { status: 'success', user: updatedUser };
-  }
-
-  // DELETE user
-  @Delete(':id')
-  async delete(@Param('id') id: number) {
-    await this.usersService.delete(id);
-    return { status: 'success', message: 'User deleted successfully' };
-  }
-
   @Post('login')
-  async login(@Body() body) {
+  async login(@Body() body, @Res({ passthrough: true }) response: Response) {
     const { email, password } = body;
     const user = await this.usersService.findByEmail(email);
     if (!user) return { status: 'error', message: 'Email tidak ditemukan' };
@@ -67,14 +35,36 @@ export class UsersController {
       id: user.id,
       role: user.role,
       email: user.email,
+      nama: user.nama,
     };
 
-    const token = await this.jwtService.signAsync(payload);
+    const token = await this.jwtService.signAsync(payload, {
+      expiresIn: '30m', // Token expired dalam 30 menit
+    });
+
+    // Set HTTP-only cookie (lebih aman)
+    response.cookie('portal_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+      sameSite: 'lax',
+      maxAge: 30 * 60 * 1000, // 30 menit dalam milidetik
+      path: '/',
+    });
+
+    // Set regular cookie untuk client-side access jika diperlukan
+    response.cookie('token', token, {
+      httpOnly: false, // Client-side bisa akses
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 30 * 60 * 1000,
+      path: '/',
+    });
 
     return {
       status: 'success',
       message: 'Login berhasil',
       token,
+      expiresIn: 1800, // 30 menit dalam detik
       user: {
         id: user.id,
         nama: user.nama,
@@ -87,31 +77,88 @@ export class UsersController {
     };
   }
 
-  @Post('verify-token')
-  verifyToken(@Body() body) {
-    try {
-      const decoded = this.jwtService.verify(body.token);
-      return { status: 'valid', decoded };
-    } catch (e) {
-      throw new UnauthorizedException('Invalid token');
-    }
+  @Post('logout')
+  async logout(@Res({ passthrough: true }) response: Response) {
+    // Hapus cookies
+    response.clearCookie('portal_token');
+    response.clearCookie('token');
+
+    return { status: 'success', message: 'Logout berhasil' };
   }
-   @Post('verify-for-monitoring')
-  async verifyTokenForMonitoring(@Body() body: { token: string }) {
+
+  @Get('check-session')
+  async checkSession(@Req() request: Request) {
     try {
-      // Verify token
-      const decoded = this.jwtService.verify(body.token);
-      
-      // Get user data dari database
+      // Cek token dari cookie
+      const token = request.cookies['portal_token'] || request.cookies['token'];
+
+      if (!token) {
+        throw new UnauthorizedException('No token provided');
+      }
+
+      // Verifikasi token
+      const decoded = this.jwtService.verify(token);
+
+      // Ambil data user terbaru
       const user = await this.usersService.findById(decoded.id);
-      
+
       if (!user) {
         throw new UnauthorizedException('User not found');
       }
 
-      // Return data yang diperlukan untuk monitoring app
       return {
         status: 'success',
+        authenticated: true,
+        user: {
+          id: user.id,
+          nama: user.nama,
+          email: user.email,
+          badge: user.badge,
+          telp: user.telp,
+          departemen: user.departemen,
+          role: user.role,
+        },
+      };
+    } catch (error) {
+      return {
+        status: 'error',
+        authenticated: false,
+        message: 'Session expired or invalid',
+      };
+    }
+  }
+
+  @Post('verify-for-monitoring')
+  async verifyTokenForMonitoring(
+    @Body() body: { token: string },
+    @Req() request: Request,
+  ) {
+    try {
+      // Cek token dari body atau cookie
+      let token = body.token;
+
+      if (!token) {
+        token = request.cookies['portal_token'] || request.cookies['token'];
+      }
+
+      if (!token) {
+        throw new UnauthorizedException('No token provided');
+      }
+
+      // Verify token
+      const decoded = this.jwtService.verify(token);
+
+      // Get user data
+      const user = await this.usersService.findById(decoded.id);
+
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      // Return data yang diperlukan
+      return {
+        status: 'success',
+        authenticated: true,
         user: {
           id: user.id,
           nama: user.nama,
@@ -125,14 +172,14 @@ export class UsersController {
       };
     } catch (error) {
       console.error('Token verification error:', error);
-      return { 
-        status: 'error', 
-        message: 'Invalid or expired token' 
+      return {
+        status: 'error',
+        authenticated: false,
+        message: 'Invalid or expired token',
       };
     }
   }
 
-  // Helper untuk menentukan permissions berdasarkan role
   private getUserPermissions(role: string) {
     const permissions = {
       view_dashboard: true,
@@ -148,5 +195,4 @@ export class UsersController {
 
     return permissions;
   }
-
 }
