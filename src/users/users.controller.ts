@@ -22,6 +22,7 @@ export class UsersController {
     private jwtService: JwtService,
   ) {}
 
+  // GET Users
   @Get()
   async getAllUsers() {
     try {
@@ -34,6 +35,126 @@ export class UsersController {
       return {
         status: 'error',
         message: 'Failed to fetch users',
+      };
+    }
+  }
+
+  // POST /users/register - TAMBAHKAN INI
+  @Post('register')
+  async register(@Body() body) {
+    try {
+      // Cek apakah email sudah terdaftar
+      const existingUser = await this.usersService.findByEmail(body.email);
+      if (existingUser) {
+        return {
+          status: 'error',
+          message: 'Email already registered',
+        };
+      }
+
+      // Buat user baru
+      const newUser = await this.usersService.create({
+        nama: body.nama,
+        email: body.email,
+        password: body.password,
+        badge: body.badge,
+        telp: body.telp,
+        departemen: body.departemen,
+        role: body.role || 'admin',
+      });
+
+      // Hapus password dari response
+      const { password, ...result } = newUser;
+
+      return {
+        status: 'success',
+        message: 'User created successfully',
+        user: result,
+      };
+    } catch (error) {
+      console.error('Error creating user:', error);
+      return {
+        status: 'error',
+        message: 'Failed to create user',
+      };
+    }
+  }
+
+  // PUT /users/:id - TAMBAHKAN INI
+  @Put(':id')
+  async updateUser(@Param('id') id: string, @Body() body) {
+    try {
+      const userId = parseInt(id);
+
+      // Cek apakah user ada
+      const existingUser = await this.usersService.findById(userId);
+      if (!existingUser) {
+        return {
+          status: 'error',
+          message: 'User not found',
+        };
+      }
+
+      // Update user
+      const updateData: any = {
+        nama: body.nama,
+        badge: body.badge,
+        telp: body.telp,
+        departemen: body.departemen,
+        role: body.role,
+      };
+
+      // Jika ada password baru, tambahkan ke updateData
+      if (body.password) {
+        updateData.password = body.password;
+      }
+
+      const updatedUser = await this.usersService.update(userId, updateData);
+
+      // Hapus password dari response
+      const { password, ...result } = updatedUser;
+
+      return {
+        status: 'success',
+        message: 'User updated successfully',
+        user: result,
+      };
+    } catch (error) {
+      console.error('Error updating user:', error);
+      return {
+        status: 'error',
+        message: 'Failed to update user',
+      };
+    }
+  }
+
+  // DELETE /users/:id - TAMBAHKAN INI
+  @Delete(':id')
+  async deleteUser(@Param('id') id: string) {
+    try {
+      const userId = parseInt(id);
+
+      // Cek apakah user ada
+      const existingUser = await this.usersService.findById(userId);
+      if (!existingUser) {
+        return {
+          status: 'error',
+          message: 'User not found',
+        };
+      }
+
+      // Delete user
+      await this.usersService.delete(userId);
+
+      return {
+        status: 'success',
+        message: 'User deleted successfully',
+      };
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      return {
+        status: 'error',
+        message: 'Failed to delete user',
       };
     }
   }
