@@ -22,6 +22,22 @@ export class UsersController {
     private jwtService: JwtService,
   ) {}
 
+  @Get()
+  async getAllUsers() {
+    try {
+      const users = await this.usersService.findAll();
+      return {
+        status: 'success',
+        users: users,
+      };
+    } catch (error) {
+      return {
+        status: 'error',
+        message: 'Failed to fetch users',
+      };
+    }
+  }
+
   @Post('login')
   async login(@Body() body, @Res({ passthrough: true }) response: Response) {
     const { email, password } = body;
