@@ -176,7 +176,7 @@ export class UsersController {
     };
 
     const token = await this.jwtService.signAsync(payload, {
-      expiresIn: '30m', // Token expired dalam 30 menit
+      expiresIn: '24h', // Token expired dalam 24 jam
     });
 
     // Set HTTP-only cookie (lebih aman)
@@ -184,7 +184,7 @@ export class UsersController {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // HTTPS only in production
       sameSite: 'lax',
-      maxAge: 30 * 60 * 1000, // 30 menit dalam milidetik
+      maxAge: 24 * 60 * 60 * 1000, // 24 jam dalam milidetik
       path: '/',
     });
 
@@ -193,7 +193,7 @@ export class UsersController {
       httpOnly: false, // Client-side bisa akses
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 30 * 60 * 1000,
+      maxAge: 24 * 60 * 60 * 1000, // 24 jam dalam milidetik
       path: '/',
     });
 
@@ -201,7 +201,7 @@ export class UsersController {
       status: 'success',
       message: 'Login berhasil',
       token,
-      expiresIn: 1800, // 30 menit dalam detik
+      expiresIn: 86400, // 24 jam dalam detik
       user: {
         id: user.id,
         nama: user.nama,
@@ -230,6 +230,7 @@ export class UsersController {
       const token = request.cookies['portal_token'] || request.cookies['token'];
 
       if (!token) {
+        // Return 401 Unauthorized instead of 200 with authenticated: false
         throw new UnauthorizedException('No token provided');
       }
 
@@ -257,11 +258,14 @@ export class UsersController {
         },
       };
     } catch (error) {
-      return {
-        status: 'error',
-        authenticated: false,
-        message: 'Session expired or invalid',
-      };
+      // Throw proper HTTP exception so frontend gets 401/403 status
+      if (error.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('Token expired');
+      }
+      if (error.name === 'JsonWebTokenError') {
+        throw new UnauthorizedException('Invalid token');
+      }
+      throw new UnauthorizedException('Session invalid');
     }
   }
 
